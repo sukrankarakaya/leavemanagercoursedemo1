@@ -10,6 +10,11 @@ function render(view) {
   const title = document.createElement("p");
   title.className = "health-title";
   title.textContent = view.title;
+  if (view.details.length === 0) {
+    // Boş liste eklenmez: ekran okuyucu "liste, 0 öğe" okumasın.
+    region.replaceChildren(title);
+    return;
+  }
   const items = view.details.map((detail) => {
     const item = document.createElement("li");
     item.textContent = detail;
