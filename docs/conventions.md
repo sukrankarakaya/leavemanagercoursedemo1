@@ -23,6 +23,9 @@
 - Frontend: saf HTML/CSS/JavaScript (ES modules, ES2022), build yok; JS testleri `node --test`
   (Node ≥ 20, npm paketi yok).
 - Bağımlılıklar `pyproject.toml`'da tanımlanır, kesin sürümler `requirements.lock`'ta sabitlenir.
+- Kurulum: `tools/setup` (lock'tan) · lock yenileme: `tools/setup --lock`. Python araçları her
+  platformda `tools/venv <komut>` ile çalışır (ör. `tools/venv python -m pytest`); uygulama:
+  `tools/venv uvicorn app.main:create_app --factory`. Kök `package.json` yalnızca ESM bildirir (A-1).
 
 ## Naming
 - Python: PEP 8 — `snake_case` modül/fonksiyon/değişken, `PascalCase` sınıf, `UPPER_SNAKE` sabit.
