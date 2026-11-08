@@ -1,6 +1,7 @@
 # Git
 
-> **Template — adjust at bootstrap.** Defaults below are safe; loosen consciously, not accidentally.
+> Bootstrap 2026-11-08'de onaylandı. Varsayılan dal: `main` · remote: `origin`
+> (`github.com/sukrankarakaya/leavemanagercoursedemo1`).
 
 ## Branching
 - `feature/<spec-no>-<short-name>` — **no branch without a spec.** Also for CHANGE-lane mini-specs.
@@ -9,12 +10,16 @@
   incidents: `incident/<date>-<short-name>`; trivial changes: `trivial/<short-name>` (see below).
 - Bootstrap: `chore/bootstrap` — the bootstrap output (`workflows/bootstrap.md`), merged like
   any branch.
+- Dal adları İngilizce, küçük harf, kelimeler tireyle: `feature/0001-walking-skeleton`.
 
 ## Commits
 - Conventional Commits, with a plan reference: `feat(catalog): paging endpoint [plan 0001/3]`.
   Review fixes name their fix round instead of the step:
   `fix(catalog): empty page size [plan 0001/fix-2]` — the reviewer counts rounds from these
   (R-06 after round 3).
+- Bu projede tür ve kapsam İngilizce (protokol), açıklama Türkçe:
+  `feat(leave): bakiye kontrolü [plan 0002/3]`. Kapsamlar: `leave`, `balance`, `auth`, `hr`, `web`,
+  `db`, `infra`, `docs`.
 - Agent commits follow the same standard: the agent writes the message, the human approves it
   through the gate before the commit, not one by one — an approved plan covers its
   `[plan NNNN/n]` and `[plan NNNN/fix-k]` commits, the ship approval the ship commit. Every
@@ -31,12 +36,13 @@
 - Force push, history rewriting on shared branches. Undo = `git revert` (see recovery R-11).
 
 ## Trivial changes
-<!-- Set at bootstrap. Applies only to requests the change-request triage rubric
+<!-- Applies only to requests the change-request triage rubric
      (workflows/change-request.md) classifies as TRIVIAL: no acceptance criterion changes, no shared code. -->
-- Policy: **(1) PR + one reviewer, no spec** — default; alternatives: (2) direct commit allowed on a
-  `trivial/<short-name>` branch · (3) everything goes through a mini-spec (`specs/TEMPLATE-mini.md`;
-  no ANALYZE here: run the self-critique pass of `prompts/spec.md`, then `Self-critique: done`).
+- Policy: **(1) PR + one reviewer, no spec** — bootstrap 2026-11-08'de seçildi. Alternatifler
+  (seçilmedi): (2) `trivial/<short-name>` dalında doğrudan commit · (3) her şey mini-spec'ten geçer.
 - Always: one narrow commit, `scripts/check` green. A second file or a new test means re-triage.
 
 ## Pull requests
-- PR template checklist completed; `scripts/check` green in CI; squash-merge.
+- PR template checklist completed; `scripts/check` green in CI; squash-merge; birleşen dal silinir.
+- `main` için GitHub branch protection önerilir: PR zorunlu + CI (`check`) yeşil zorunlu
+  (insanın GitHub ayarlarından açması gerekir).
