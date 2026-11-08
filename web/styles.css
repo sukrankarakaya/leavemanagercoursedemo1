@@ -1,0 +1,53 @@
+/* Renkler WCAG AA kontrastında; anlam her durumda metinle de verilir. */
+:root {
+  --text: #1a1a1a;
+  --bg: #ffffff;
+  --muted-bg: #f3f4f6;
+  --ok: #14532d;
+  --ok-bg: #dcfce7;
+  --error: #7f1d1d;
+  --error-bg: #fee2e2;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+main {
+  max-width: 40rem;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+.health {
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--muted-bg);
+}
+
+.health[data-tone="ok"] {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.health[data-tone="error"] {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.health-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.health-details {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+/* Hareket yok; ileride eklenirse azaltılmış hareket tercihi korunur (docs/testing.md, Determinism). */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

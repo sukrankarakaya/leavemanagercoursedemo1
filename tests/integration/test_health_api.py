@@ -38,3 +38,19 @@ def test_health_db_unavailable_returns_503_without_internals(
     body = response.text.lower()
     for leak in ("missing-dir", "unreachable.db", str(tmp_path).lower(), "traceback", "sqlite"):
         assert leak not in body
+
+
+def test_index_page_is_served_in_turkish(db_url: str, fixed_clock: FixedClock) -> None:
+    with TestClient(create_app(Settings(database_url=db_url), fixed_clock)) as client:
+        response = client.get("/")
+        script = client.get("/app.js")
+
+    assert response.status_code == 200
+    assert '<html lang="tr">' in response.text
+    assert 'aria-live="polite"' in response.text
+    # ES module'ü tarayıcı yalnızca JavaScript MIME türüyle yükler (Windows kayıt defteri farkları).
+    assert script.status_code == 200
+    assert script.headers["content-type"].split(";")[0] in {
+        "application/javascript",
+        "text/javascript",
+    }
