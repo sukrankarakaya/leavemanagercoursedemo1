@@ -2,6 +2,8 @@
 import { healthView, stateFromResponse } from "./health-view.js";
 
 const region = document.getElementById("health");
+// Takılan istek "Yükleniyor"da bırakmasın: süre dolunca hata durumu gösterilir (AC-6).
+const REQUEST_TIMEOUT_MS = 10_000;
 
 function render(view) {
   region.dataset.tone = view.tone;
@@ -21,7 +23,10 @@ function render(view) {
 
 async function fetchHealth() {
   try {
-    const response = await fetch("/api/health", { headers: { Accept: "application/json" } });
+    const response = await fetch("/api/health", {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
     let body = null;
     try {
       body = await response.json();
