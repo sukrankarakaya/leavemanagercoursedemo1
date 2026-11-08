@@ -72,6 +72,7 @@
 - Windows yol/satır sonu farkları — yollar için `pathlib`; script'ler `.gitattributes` ile LF — from bootstrap 2026-11-08.
 - Kullanıcı verisini `innerHTML` ile basmak XSS'tir — `textContent` / `createElement` kullan — from bootstrap 2026-11-08.
 - Tarih aralığında off-by-one — BR-1 başlangıç ve bitiş dahil; sınır günleri için test zorunlu — from bootstrap 2026-11-08.
+- `node --test` eşleşmeyen glob'da 0 testle exit 0 verir (dizin argümanını da dosya sanar) — web testlerini yalnızca `tools/web-test` ile çalıştır, 0 testte kırmızı verir — from spec 0001, review round 1 (L-3, A-3).
 
 ## Enforced by tooling
 <!-- Walking skeleton bu araçları scripts/check.conf'ta etkinleştirdiğinde geçerli olur. -->
