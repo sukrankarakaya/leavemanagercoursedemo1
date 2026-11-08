@@ -4,6 +4,8 @@
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 if [ $# -eq 0 ]; then echo "usage: tools/venv <command> [args...]" >&2; exit 2; fi
 cmd=$1; shift
+# UTF-8 I/O on every platform (Turkish text in tool output; Windows consoles default to cp1252).
+PYTHONUTF8=1; export PYTHONUTF8
 for dir in "$ROOT/.venv/Scripts" "$ROOT/.venv/bin"; do
   [ -d "$dir" ] || continue
   if [ -f "$dir/$cmd" ] || [ -f "$dir/$cmd.exe" ]; then exec "$dir/$cmd" "$@"; fi
