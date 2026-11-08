@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "leave-manager"
+version = "0.1.0"
+description = "İzin Yöneticisi — kurs/demo MVP"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "sqlalchemy>=2.0,<2.1",
+  "alembic",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "httpx",
+  "pytest-cov",
+  "ruff",
+  "mypy",
+  "import-linter",
+  "pip-audit",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+# --- Ruff: lint + format (docs/conventions.md, Enforced by tooling) ---
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "N", "SIM", "S", "DTZ"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+# --- mypy ---
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+# --- pytest: fast/full split by selector (docs/testing.md, Two speeds rule 4) ---
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
+markers = ["integration: API + gerçek SQLite testleri (full profil)"]
+
+[tool.coverage.run]
+branch = true
+
+# --- import-linter: docs/architecture.md "Forbidden dependencies" ---
+[tool.importlinter]
+root_package = "app"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Katman sırası (döngü yok, yukarı doğru import yok) — kural 6"
+type = "layers"
+containers = ["app"]
+layers = ["main", "api", "services", "repositories", "db", "domain"]
+
+[[tool.importlinter.contracts]]
+name = "domain saf kalır — kural 1"
+type = "forbidden"
+source_modules = ["app.domain"]
+forbidden_modules = [
+  "app.api", "app.services", "app.repositories", "app.db", "app.main", "app.config",
+  "fastapi", "starlette", "sqlalchemy", "pydantic", "alembic",
+]
+
+[[tool.importlinter.contracts]]
+name = "api, repositories/db'ye doğrudan erişmez — kural 2"
+type = "forbidden"
+source_modules = ["app.api"]
+forbidden_modules = ["app.repositories", "app.db"]
+
+[[tool.importlinter.contracts]]
+name = "services FastAPI/Starlette bilmez — kural 3"
+type = "forbidden"
+source_modules = ["app.services"]
+forbidden_modules = ["fastapi", "starlette"]
+
+[[tool.importlinter.contracts]]
+name = "repositories ve db, services/api'yi import etmez — kural 4"
+type = "forbidden"
+source_modules = ["app.repositories", "app.db"]
+forbidden_modules = ["app.services", "app.api"]

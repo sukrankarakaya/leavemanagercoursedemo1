@@ -1,0 +1,12 @@
+#!/bin/sh
+# tools/venv <command> [args…] — runs <command> from the project's virtualenv.
+# Same call on Windows (.venv/Scripts) and Linux/macOS (.venv/bin), so scripts/check.conf stays one file.
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ $# -eq 0 ]; then echo "usage: tools/venv <command> [args...]" >&2; exit 2; fi
+cmd=$1; shift
+for dir in "$ROOT/.venv/Scripts" "$ROOT/.venv/bin"; do
+  [ -d "$dir" ] || continue
+  if [ -f "$dir/$cmd" ] || [ -f "$dir/$cmd.exe" ]; then exec "$dir/$cmd" "$@"; fi
+  echo "tools/venv: '$cmd' not found in $dir — run tools/setup" >&2; exit 127
+done
+echo "tools/venv: .venv missing — run tools/setup" >&2; exit 127
