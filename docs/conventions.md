@@ -21,8 +21,11 @@
 - Test: pytest + FastAPI `TestClient` (httpx) + pytest-cov · Lint/format: Ruff · Tip: mypy.
 - Parola: `argon2-cffi`. Bağımlılık taraması: `pip-audit`. Mimari sözleşme: `import-linter`.
 - Frontend: saf HTML/CSS/JavaScript (ES modules, ES2022), build yok; JS testleri `node --test`
-  (Node ≥ 20, npm paketi yok).
+  (Node ≥ 21 — `--test` glob desteği, A-1; npm paketi yok).
 - Bağımlılıklar `pyproject.toml`'da tanımlanır, kesin sürümler `requirements.lock`'ta sabitlenir.
+- Kurulum: `tools/setup` (lock'tan) · lock yenileme: `tools/setup --lock`. Python araçları her
+  platformda `tools/venv <komut>` ile çalışır (ör. `tools/venv python -m pytest`); uygulama:
+  `tools/venv uvicorn app.main:create_app --factory`. Kök `package.json` yalnızca ESM bildirir (A-1).
 
 ## Naming
 - Python: PEP 8 — `snake_case` modül/fonksiyon/değişken, `PascalCase` sınıf, `UPPER_SNAKE` sabit.
@@ -69,6 +72,8 @@
 - Windows yol/satır sonu farkları — yollar için `pathlib`; script'ler `.gitattributes` ile LF — from bootstrap 2026-11-08.
 - Kullanıcı verisini `innerHTML` ile basmak XSS'tir — `textContent` / `createElement` kullan — from bootstrap 2026-11-08.
 - Tarih aralığında off-by-one — BR-1 başlangıç ve bitiş dahil; sınır günleri için test zorunlu — from bootstrap 2026-11-08.
+- `node --test` eşleşmeyen glob'da 0 testle exit 0 verir (dizin argümanını da dosya sanar) — web testlerini yalnızca `tools/web-test` ile çalıştır, 0 testte kırmızı verir — from spec 0001, review round 1 (L-3, A-3).
+- Starlette ≥1.x `TestClient` httpx yerine httpx2 bekliyor (StarletteDeprecationWarning) — `tools/setup --lock` ile lock yenilemeden önce kontrol et; uyarıyı susturma (B-4) — from spec 0001, review round 1 (L-4, A-3).
 
 ## Enforced by tooling
 <!-- Walking skeleton bu araçları scripts/check.conf'ta etkinleştirdiğinde geçerli olur. -->

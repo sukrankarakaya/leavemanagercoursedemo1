@@ -1,0 +1,22 @@
+#!/bin/sh
+# tools/setup — creates .venv (Python 3.12) and installs the pinned dependencies.
+# Run once after clone and after requirements.lock changes. Never part of scripts/check.
+#   tools/setup          install from requirements.lock (+ the app itself, editable)
+#   tools/setup --lock   resolve from pyproject.toml and rewrite requirements.lock
+set -e
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$ROOT"
+PY=${PYTHON:-python}
+command -v "$PY" >/dev/null 2>&1 || PY=python3
+if [ ! -d .venv ]; then "$PY" -m venv .venv; fi
+tools/venv python -c "import sys; sys.exit(0 if sys.version_info[:2] == (3, 12) else 1)" \
+  || { echo "tools/setup: .venv is not Python 3.12 — delete .venv and set PYTHON" >&2; exit 1; }
+if [ "${1:-}" = "--lock" ]; then
+  tools/venv python -m pip install --quiet --disable-pip-version-check -e ".[dev]"
+  tools/venv python -m pip freeze --exclude-editable --disable-pip-version-check > requirements.lock
+  echo "tools/setup: requirements.lock written"
+else
+  tools/venv python -m pip install --quiet --disable-pip-version-check -r requirements.lock
+  tools/venv python -m pip install --quiet --disable-pip-version-check --no-deps -e .
+fi
+echo "tools/setup: ready"

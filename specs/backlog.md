@@ -20,3 +20,5 @@ step 7). Nothing lands here without that decision; noise is rejected in the tria
   — Recommendation: MVP sonrası ayrı spec; e-posta altyapısı gerektirir — Deferred by: sukrankarakaya, 2026-11-08, MVP demo kapsamı dışında
 - **B-3** — İki adımlı doğrulama (2FA) yok — Source: bootstrap 2026-11-08 — Severity: Low
   — Recommendation: gerçek kullanıma geçilirse ayrı spec — Deferred by: sukrankarakaya, 2026-11-08, MVP demo kapsamı dışında
+- **B-4** — Starlette ≥1.x `TestClient` httpx yerine httpx2 bekliyor (StarletteDeprecationWarning); lock yenilemesi integration testlerini kırabilir — Source: spec 0001, review round 1 (`requirements.lock:21`) — Severity: Low
+  — Recommendation: httpx2'ye geçiş + `docs/conventions.md` güncellemesi (gerekirse ADR notu); uyarı susturulmaz — Deferred by: sukrankarakaya, 2026-11-09, spec 0001 "yeni bağımlılık yok"

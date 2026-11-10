@@ -1,0 +1,1 @@
+"""İzin Yöneticisi uygulaması."""

@@ -1,0 +1,16 @@
+#!/bin/sh
+# tools/web-test [glob] — runs `node --test` over the web tests and fails when they fail OR when
+# zero tests ran (node exits 0 on a glob that matches nothing — Known traps; plan 0001 A-2).
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$ROOT" || exit 1
+pattern=${1:-tests/web/**/*.test.js}
+# --test-reporter=tap: the pass count below is read from TAP; newer Node defaults to "spec" (F-1).
+out=$(node --test --test-reporter=tap "$pattern" 2>&1)
+rc=$?
+printf '%s\n' "$out"
+[ "$rc" -eq 0 ] || exit "$rc"
+passed=$(printf '%s\n' "$out" | sed -n 's/^# pass \([0-9][0-9]*\)[[:space:]]*$/\1/p' | tail -n 1)
+if [ -z "$passed" ] || [ "$passed" -eq 0 ]; then
+  echo "tools/web-test: 0 tests passed for '$pattern' — the selector matched nothing" >&2
+  exit 1
+fi

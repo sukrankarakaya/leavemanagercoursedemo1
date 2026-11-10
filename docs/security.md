@@ -5,8 +5,8 @@
 ## Secrets
 - Secrets never enter the repo, specs, prompts, or chat. `.env` is gitignored; provide `.env.example`.
 - Agents never print secret values, even when debugging.
-- Oturum imzalama anahtarı (`SECRET_KEY`) ve DB yolu `.env`'den okunur; repoda yalnızca
-  `.env.example` (sahte değerlerle) bulunur.
+- Oturum imzalama anahtarı (`SECRET_KEY`) ve DB yolu ortam değişkenlerinden okunur (uygulama `.env`
+  dosyasını kendisi okumaz); repoda yalnızca `.env.example` (sahte değerlerle) belgeler.
 
 ## Input & output
 - Tüm girdiler sınırda (`api`) Pydantic v2 şemalarıyla doğrulanır; bilinmeyen alanlar reddedilir
