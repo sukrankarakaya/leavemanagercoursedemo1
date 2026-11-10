@@ -22,3 +22,5 @@ step 7). Nothing lands here without that decision; noise is rejected in the tria
   — Recommendation: gerçek kullanıma geçilirse ayrı spec — Deferred by: sukrankarakaya, 2026-11-08, MVP demo kapsamı dışında
 - **B-4** — Starlette ≥1.x `TestClient` httpx yerine httpx2 bekliyor (StarletteDeprecationWarning); lock yenilemesi integration testlerini kırabilir — Source: spec 0001, review round 1 (`requirements.lock:21`) — Severity: Low
   — Recommendation: httpx2'ye geçiş + `docs/conventions.md` güncellemesi (gerekirse ADR notu); uyarı susturulmaz — Deferred by: sukrankarakaya, 2026-11-09, spec 0001 "yeni bağımlılık yok"
+- **B-5** — Parola değiştirmede yanlış "mevcut parola" denemeleri sınırlanmıyor — Source: spec 0002, self-critique (madde 7) — Severity: Low
+  — Recommendation: giriş denemesi sınırına benzer sayaç (kullanıcı başına) — Deferred by: sukrankarakaya, 2026-11-11, kullanıcı zaten oturum açmış; spec 0002 kapsamı dışında
