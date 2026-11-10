@@ -5,6 +5,7 @@ import os
 from alembic import context
 
 from app.db.engine import make_engine
+from app.db.models import Base
 
 DEFAULT_URL = "sqlite:///data/app.db"
 
@@ -15,7 +16,7 @@ def _url() -> str:
 
 
 def run_offline() -> None:
-    context.configure(url=_url(), target_metadata=None, literal_binds=True)
+    context.configure(url=_url(), target_metadata=Base.metadata, literal_binds=True)
     with context.begin_transaction():
         context.run_migrations()
 
@@ -25,7 +26,9 @@ def run_online() -> None:
     try:
         with engine.connect() as connection:
             # render_as_batch: SQLite ALTER TABLE sınırlamaları için.
-            context.configure(connection=connection, target_metadata=None, render_as_batch=True)
+            context.configure(
+                connection=connection, target_metadata=Base.metadata, render_as_batch=True
+            )
             with context.begin_transaction():
                 context.run_migrations()
     finally:
