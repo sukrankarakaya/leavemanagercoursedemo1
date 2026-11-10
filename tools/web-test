@@ -4,7 +4,8 @@
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$ROOT" || exit 1
 pattern=${1:-tests/web/**/*.test.js}
-out=$(node --test "$pattern" 2>&1)
+# --test-reporter=tap: the pass count below is read from TAP; newer Node defaults to "spec" (F-1).
+out=$(node --test --test-reporter=tap "$pattern" 2>&1)
 rc=$?
 printf '%s\n' "$out"
 [ "$rc" -eq 0 ] || exit "$rc"
