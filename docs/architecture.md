@@ -21,6 +21,7 @@ Gerekçe: tek geliştiricili kurs/demo MVP'si için en az hareketli parça — A
 | `app/repositories/` | Veri erişimi: SQLAlchemy sorguları, domain nesnesi ↔ ORM satırı dönüşümü | Sorgular |
 | `app/db/` | SQLAlchemy modelleri, engine/oturum kurulumu (PRAGMA'lar), Alembic migration'ları | Şema ve kalıcı veri |
 | `app/main.py` | Uygulama kurulumu: router'ları bağlama, statik dosyaları sunma, ayarlar | Uygulama yaşam döngüsü |
+| `app/cli.py` | Yönetim komutları (ikinci composition root): ilk İK hesabı (spec 0002) | — |
 | `web/` | Tarayıcı arayüzü: HTML sayfaları, CSS, ES module JS; DOM'a dokunmayan mantık ayrı modüllerde | Sunum ve arayüz durumu |
 | `tests/` | `unit/` (domain, services) · `integration/` (api + gerçek SQLite) · `web/` (`node --test`) | Test verisi (uydurma) |
 
@@ -29,7 +30,10 @@ Gerekçe: tek geliştiricili kurs/demo MVP'si için en az hareketli parça — A
   `repositories` domain tiplerini kullanabilir (döndürür/alır).
 - Katmanlar arası iletişim doğrudan fonksiyon çağrısıdır; olay/mesaj kuyruğu yoktur (MVP).
 - Transaction sınırı `services` katmanındadır: bir kullanım senaryosu = bir DB transaction'ı.
+  Servisler `UnitOfWork` arayüzüyle (`app/services/ports.py`) çalışır; somut `SqlUnitOfWork`
+  (`app/repositories/unit_of_work.py`) yazma kilidini transaction başında alır (SQLite `BEGIN IMMEDIATE`).
 - `web/` backend ile **yalnızca** `/api/...` JSON uçları üzerinden `fetch` ile konuşur.
+- `app/main.py` ve `app/cli.py` composition root'tur: somut repository/UoW/hasher'ı yalnızca onlar bağlar.
 - `api` katmanı `services`'i FastAPI dependency'leri ile alır; testlerde bunlar override edilir
   (ör. sabit `Clock`, geçici DB).
 

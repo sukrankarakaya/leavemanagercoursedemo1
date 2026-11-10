@@ -19,6 +19,10 @@
 | İş günü (`Workday`) | Cumartesi, Pazar ve tanımlı resmî tatiller dışındaki gün. | Takvim günü değil. |
 | Resmî tatil (`Holiday`) | İK'nın tanımladığı, iş günü sayılmayan tarih. | |
 | Denetim kaydı (`AuditEntry`) | Bir talebin her durum değişikliğinde kim, ne zaman, hangi geçişi yaptı kaydı. | Silinmez, değiştirilmez. |
+| Hesap (`User`) | İK'nın açtığı, e-posta + parola ile giriş yapan kullanıcı kaydı; tek rolü vardır. | Herkese açık kayıt yok (spec 0002). |
+| Geçici parola (`temp_password`) | Hesap açılırken sistemin ürettiği 12 karakterlik parola; İK'ya bir kez gösterilir, ilk girişte değiştirilmek zorundadır. | Düz metin saklanmaz. |
+| Oturum (`Session`) | Başarılı girişle başlayan erişim süresi; 30 dk hareketsizlikte veya girişten 8 saat sonra biter. | Sunucuda yalnızca kimliğin özeti tutulur. |
+| Giriş sınırı (`LoginThrottle`) | Aynı e-posta için 15 dk içinde 5 başarısız denemeden sonra 15 dk giriş reddi. | Var olmayan e-posta da sayılır. |
 
 ## Business rules
 
