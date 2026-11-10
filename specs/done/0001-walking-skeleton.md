@@ -1,6 +1,6 @@
 # Spec 0001 — walking skeleton
 
-- Status: In progress
+- Status: Shipped
 - Mode: lite
 - Plan: `specs/plans/0001-plan.md`
 - Self-critique: done
@@ -62,36 +62,51 @@ yönetimi, arayüz tasarımı.
   görsel çalışma, dağıtım (deploy), Docker.
 
 ## Acceptance criteria
-- [ ] AC-1 — Sistem ve veritabanı ayaktayken durum sorgusu "çalışıyor", veritabanı "erişilebilir" ve
+- [x] AC-1 — Sistem ve veritabanı ayaktayken durum sorgusu "çalışıyor", veritabanı "erişilebilir" ve
   sabit saat kaynağının verdiği zamanı UTC ISO 8601 olarak döner (R-1, R-5).
-- [ ] AC-2 — Veritabanına erişilemezken durum sorgusu "bozuk" durumunu standart hata biçiminde, başarısız
+- [x] AC-2 — Veritabanına erişilemezken durum sorgusu "bozuk" durumunu standart hata biçiminde, başarısız
   bir durum kodu ve sabit bir hata koduyla döner; yanıtta dosya yolu, hata metni veya yığın izi yoktur (R-2).
-- [ ] AC-3 — İlk çalıştırma boş veritabanında şemayı en güncel sürüme kurar; ikinci çalıştırma yapılacak
+- [x] AC-3 — İlk çalıştırma boş veritabanında şemayı en güncel sürüme kurar; ikinci çalıştırma yapılacak
   değişiklik bulmaz ve şema sürüm bilgisini değiştirmez; açılan her veritabanı bağlantısında ilişki
   bütünlüğü zorlaması açıktır (R-3).
-- [ ] AC-4 — Ana sayfa, yanıt gelmeden önce "Yükleniyor" durumunu gösterir (R-4).
-- [ ] AC-5 — Başarılı yanıtta ana sayfa "Sistem çalışıyor", veritabanı durumu ve sunucu zamanını
+- [x] AC-4 — Ana sayfa, yanıt gelmeden önce "Yükleniyor" durumunu gösterir (R-4).
+- [x] AC-5 — Başarılı yanıtta ana sayfa "Sistem çalışıyor", veritabanı durumu ve sunucu zamanını
   (UTC ISO 8601, olduğu gibi, "UTC" etiketiyle) gösterir (R-4).
-- [ ] AC-6 — Hata yanıtında veya yanıt alınamadığında ana sayfa "Sistem şu anda kullanılamıyor"
+- [x] AC-6 — Hata yanıtında veya yanıt alınamadığında ana sayfa "Sistem şu anda kullanılamıyor"
   gösterir, teknik ayrıntı göstermez (R-4).
-- [ ] AC-7 — `./scripts/check` (full ve `--fast`) planlanan adımların tümünü çalıştırır ve yeşildir;
+- [x] AC-7 — `./scripts/check` (full ve `--fast`) planlanan adımların tümünü çalıştırır ve yeşildir;
   unit, integration ve arayüz mantığı katmanlarının her birinde çalışan test sayısı > 0'dır (R-6).
-- [ ] AC-8 — `docs/architecture.md`'deki yasak bağımlılıklardan birinin bilerek ihlali
+- [x] AC-8 — `docs/architecture.md`'deki yasak bağımlılıklardan birinin bilerek ihlali
   `./scripts/check`'i kırmızıya düşürür (R-6).
-- [ ] AC-9 — `./scripts/check` full profili CI'da (Linux) da yeşildir, aynı `check.conf` ile (R-7).
+- [x] AC-9 — `./scripts/check` full profili CI'da (Linux) da yeşildir, aynı `check.conf` ile (R-7).
+
+## Evidence (criterion ↔ evidence, VERIFY round 1–2 — bağımsız QA)
+| Acceptance criterion | Evidence | Status |
+|---|---|---|
+| AC-1 | `tests/integration/test_health_api.py::test_health_ok_reports_db_and_fixed_utc_time` · `tests/unit/test_health_service.py::test_check_ok_uses_clock` — bilinçli bozma: kırmızı | PASS |
+| AC-2 | `tests/integration/test_health_api.py::test_health_db_unavailable_returns_503_without_internals` · `tests/unit/test_health_service.py::test_check_raises_when_db_unreachable` — bilinçli bozma: kırmızı | PASS |
+| AC-3 | `tests/integration/test_migrations.py::test_upgrade_installs_head_and_is_idempotent` · `::test_every_connection_enforces_foreign_keys` — bilinçli bozma: kırmızı | PASS |
+| AC-4 | `tests/web/health-view.test.js` "loading state" + S-1 | PASS |
+| AC-5 | `tests/web/health-view.test.js` "ok state" + S-2 | PASS |
+| AC-6 | `tests/web/health-view.test.js` "error state" / "network failure" + S-3, S-4 | PASS |
+| AC-7 | `./scripts/check` — CHECK GREEN (full, 9 steps, 85 s) @2734115 · CHECK GREEN (fast) @0e2b7bf · `tools/web-test` 0 testte kırmızı (bozma denemesi) | PASS |
+| AC-8 | Bilinçli bozma (repo dışı kopya): `app/api` → `app.db` importu → `lint-imports` "kural 2 BROKEN", `Contracts: 4 kept, 1 broken` | PASS |
+| AC-9 | CI https://github.com/sukrankarakaya/leavemanagercoursedemo1/actions/runs/42890382377 @0e2b7bf — CHECK GREEN (full, 9 steps, 17 s), Linux | PASS |
+
+S-1…S-4 agent-captured, judged by sukrankarakaya at SHIP, 2026-11-10.
 
 ## Definition of Done
-- [ ] Every acceptance criterion mapped to proof (test or reproducible observation)
-- [ ] `scripts/check` green
-- [ ] Independent review done; real findings fixed, noise rejected with written rationale, deferred ones in `specs/backlog.md`
-- [ ] Docs / ADRs updated if behavior or architecture changed
-- [ ] Spec moved to `specs/done/` (it becomes immutable there)
+- [x] Every acceptance criterion mapped to proof (test or reproducible observation)
+- [x] `scripts/check` green
+- [x] Independent review done; real findings fixed, noise rejected with written rationale, deferred ones in `specs/backlog.md`
+- [x] Docs / ADRs updated if behavior or architecture changed
+- [x] Spec moved to `specs/done/` (it becomes immutable there)
 
 ## Scorecard (fill at ship — honest numbers make the process improvable)
 | Metric | Value |
 |---|---|
-| Spec revisions | |
-| Fix rounds | |
-| Review findings: real / noise / deferred | |
-| Regressions introduced | |
-| Bugs escaped to production | |
+| Spec revisions | 1 (self-critique 6 öneri, onaydan önce) |
+| Fix rounds | 2 |
+| Review findings: real / noise / deferred | 6 / 3 / 1 (review 5/3/1 + VERIFY F-1 real; B-4) |
+| Regressions introduced | 0 |
+| Bugs escaped to production | 0 (henüz dağıtım yok) |
