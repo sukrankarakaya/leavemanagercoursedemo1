@@ -1,6 +1,7 @@
 # Testing
 
-> **Template — filled during bootstrap.**
+> Bootstrap 2026-11-08'de dolduruldu. Aşağıdaki proje bölümleri Türkçe; ANEW'in genel kuralları
+> (Test layers'tan itibaren) olduğu gibi geçerlidir.
 
 ## The contract
 - Every acceptance criterion maps to at least one test (criterion ↔ test map lives in the plan).
@@ -8,11 +9,37 @@
 - The whole suite runs inside `scripts/check` — one command, everywhere.
 
 ## Frameworks & layout
-<!-- Test framework(s), where tests live, naming pattern. -->
+| Katman | Kapsam | Araç / yer | Profil |
+|---|---|---|---|
+| Unit | `app/domain`, `app/services` (repository'ler sahte/in-memory) | pytest · `tests/unit/` · marker yok | `[fast]` |
+| Integration | `app/api` → gerçek SQLite, uçtan uca HTTP | pytest + `TestClient` · `tests/integration/` · `@pytest.mark.integration` | full |
+| UI mantığı | `web/` içindeki DOM'a dokunmayan saf JS (doğrulama, biçimlendirme, yanıt → görünüm modeli) | `node --test` · `tests/web/*.test.js` | `[fast]` |
+| E2E | **Yok** (karar: bootstrap 2026-11-08) | — | — |
+
+- Fast/full ayrımı **seçiciyle**: `pytest -m "not integration"` ([fast]) ve `pytest -m integration`
+  (full). `tests/integration/conftest.py` o klasördeki her testi otomatik `integration` olarak işaretler;
+  böylece yeni bir test her zaman iki profilden birinde çalışır (Two speeds rule 4).
+- Adlandırma: `docs/conventions.md` "Naming" (`test_br<n>_<davranış>`).
+- **Determinizm:** "bugün" yalnızca `Clock` ile; testler sabit `FixedClock(date(...))` verir. Resmî
+  tatiller testte sabit fixture. Rastgelelik yok; gereken UUID'ler testte sabit. Saat dilimi UTC,
+  arayüz metinleri `tr-TR` sabit. Arayüzde animasyon/geçiş yok (CSS'te `prefers-reduced-motion`
+  destekli, testlerde kapalı). Ekran görüntüsü yakalanacaksa uygulama sabit `Clock` ve uydurma
+  seed verisiyle başlatılır.
+- **Veri hijyeni:** her test kendi DB'sini kullanır (`tmp_path` altında dosya veya `StaticPool`'lu
+  `:memory:`); test bitince silinir. Geliştirme DB'si (`data/*.db`) testlerde asla kullanılmaz.
 
 ## What must be tested
-<!-- e.g. every business rule (BR-n), every boundary/forbidden dependency; the e2e journeys and
-     budget, if the project has e2e at all (Test layers). -->
+- Her iş kuralı (BR-1…BR-8) ve her alan değişmezi (`docs/domain.md`): en az bir olumlu ve bir olumsuz
+  test; BR-1 ve BR-8 için sınır günleri (hafta sonu, tatil, tam 7 gün / 8 gün geriye).
+- Hassas alanlara dokunan her kabul kriteri: en az bir **olumsuz** test (yetkisiz erişim/onay,
+  bakiye aşımı, başkasının `SICK` detayını görme → 404).
+- Her geçerli ve geçersiz durum geçişi.
+- Hata sözleşmesi: her `error.code` en az bir integration testinde gövdesiyle doğrulanır.
+- Yasak bağımlılıklar: `import-linter` sözleşmesi (check adımı).
+- Arayüz kriterleri: davranış API integration testiyle, arayüz mantığı `node --test` ile, görsel
+  durumlar VERIFY'da ekran görüntüsüyle (Evidence for UI criteria). E2E bütçesi: 0 yolculuk.
+- Kapsam tabanı: `app/domain` + `app/services` için `pytest-cov` ≥ %90 (taban, hedef değil; asıl
+  ölçüt her kriterin bir teste bağlı olması).
 
 ## Test layers
 1. **The cheapest test that proves the criterion.** Unit first, then component or integration

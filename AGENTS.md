@@ -1,15 +1,16 @@
 # AGENTS.md — Project Rules
 
-> **STATUS: NOT CONFIGURED.** This workspace has not been adapted to a project yet.
-> The only correct first action is the bootstrap workflow (`workflows/bootstrap.md`).
-> Until bootstrap completes and rewrites this file, do not write application code.
+**İzin Yöneticisi (Leave Manager)** — çalışanların izin talep ettiği, yöneticilerin onaylayıp reddettiği,
+İK'nın izin türlerini ve bakiyeleri yönettiği tek şirketlik web uygulaması (kurs/demo, MVP).
+Python 3.12 · FastAPI · SQLAlchemy 2 + SQLite · saf HTML/CSS/JS. Katmanlı monolit (ADR 0001).
+Hassas alanlar: Yetkilendirme · İzin bakiyesi · Kişisel veri (`docs/domain.md`).
 
 ## Operating mode
 
-**Mode: unset** — bootstrap sets `lite` or `strict` (`workflows/README.md`); every workflow honors its gates.
+**Mode: lite** — set at bootstrap (`workflows/README.md`); every workflow honors its gates.
 **Start work** with `/new-feature` in lite (it chains the segments and asks at each gate) or with
 `/analyze` in strict (one segment per role). Segment commands always stop (`workflows/segments.md`).
-**Language: unset** — bootstrap sets `chat=<xx> · docs=<xx>`; protocol fields stay English (`docs/conventions.md`).
+**Language: chat=tr · docs=tr** — protocol fields stay English (`docs/conventions.md`).
 
 ## Invariant rules (these survive bootstrap — never delete or weaken them)
 

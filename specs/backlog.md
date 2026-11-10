@@ -13,3 +13,10 @@ step 7). Nothing lands here without that decision; noise is rejected in the tria
   — Recommendation: <the reviewer's action> — Deferred by: <name>, <YYYY-MM-DD>, <why>
   A decision deferred at bootstrap (its REPORT) uses Source: bootstrap <YYYY-MM-DD>.
 -->
+
+- **B-1** — Giriş denemesi sınırlama (rate limit / brute-force koruması) yok — Source: bootstrap 2026-11-08 — Severity: Medium
+  — Recommendation: MVP sonrası ayrı spec (hassas alan: Yetkilendirme) — Deferred by: sukrankarakaya, 2026-11-08, MVP demo kapsamı dışında
+- **B-2** — Parola sıfırlama akışı yok — Source: bootstrap 2026-11-08 — Severity: Low
+  — Recommendation: MVP sonrası ayrı spec; e-posta altyapısı gerektirir — Deferred by: sukrankarakaya, 2026-11-08, MVP demo kapsamı dışında
+- **B-3** — İki adımlı doğrulama (2FA) yok — Source: bootstrap 2026-11-08 — Severity: Low
+  — Recommendation: gerçek kullanıma geçilirse ayrı spec — Deferred by: sukrankarakaya, 2026-11-08, MVP demo kapsamı dışında
