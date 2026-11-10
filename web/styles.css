@@ -44,6 +44,116 @@ main {
   padding-left: 1.25rem;
 }
 
+/* --- spec 0002: üst çubuk, formlar, kullanıcı listesi --- */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--muted-bg);
+}
+
+.topbar nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topbar a {
+  color: #1d3a8a;
+}
+
+.card {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+}
+
+label {
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+
+input,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  font: inherit;
+  border: 1px solid #6b7280;
+  border-radius: 0.25rem;
+}
+
+input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  color: #fff;
+  background: #1d3a8a;
+  border: 0;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #6b7280;
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 3px solid #1d3a8a;
+  outline-offset: 2px;
+}
+
+.field-error,
+.form-error {
+  margin: 0.25rem 0 0;
+  min-height: 1.25rem;
+  color: var(--error);
+}
+
+.form-status,
+.notice {
+  color: var(--ok);
+}
+
+.hint {
+  color: #374151;
+}
+
+.warning {
+  color: var(--error);
+  font-weight: 600;
+}
+
+table.users {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.users th,
+table.users td {
+  padding: 0.4rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
 /* Hareket yok; ileride eklenirse azaltılmış hareket tercihi korunur (docs/testing.md, Determinism). */
 @media (prefers-reduced-motion: reduce) {
   * {

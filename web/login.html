@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Giriş — İzin Yöneticisi</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>İzin Yöneticisi</h1>
+      <p id="notice" class="notice" role="status" hidden></p>
+      <form id="login-form" class="card" novalidate>
+        <h2>Giriş</h2>
+        <label for="email">E-posta</label>
+        <input id="email" name="email" type="email" autocomplete="username" required
+               aria-describedby="email-error" />
+        <p id="email-error" class="field-error"></p>
+        <label for="password">Parola</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required
+               aria-describedby="password-error" />
+        <p id="password-error" class="field-error"></p>
+        <p id="form-error" class="form-error" role="alert"></p>
+        <p id="form-status" class="form-status" role="status"></p>
+        <button id="submit" type="submit">Giriş yap</button>
+      </form>
+    </main>
+    <script type="module">
+      import { afterLogin, errorState, formView, loginNotice, TEXT } from "/auth-view.js";
+      import { api, showFieldErrors } from "/session.js";
+
+      const form = document.getElementById("login-form");
+      const notice = document.getElementById("notice");
+      const message = loginNotice(window.location.search);
+      if (message) {
+        notice.textContent = message;
+        notice.hidden = false;
+      }
+
+      function render(state) {
+        const view = formView("login", state);
+        document.getElementById("submit").disabled = view.disabled;
+        document.getElementById("submit").textContent = view.button;
+        document.getElementById("form-error").textContent = view.formError;
+        document.getElementById("form-status").textContent = view.status;
+        showFieldErrors(form, view.fieldErrors);
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        render({ kind: "submitting" });
+        const result = await api("/api/auth/login", {
+          method: "POST",
+          redirect: false,
+          body: { email: form.email.value, password: form.password.value },
+        });
+        if (result && result.status === 200) {
+          render({ kind: "success" });
+          window.location.assign(afterLogin(result.body));
+          return;
+        }
+        render(result ? errorState(result.body) : { kind: "error", message: TEXT.genericError, fields: {} });
+        form.password.value = "";
+        form.password.focus();
+      });
+      render({ kind: "idle" });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kullanıcılar — İzin Yöneticisi</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header id="topbar" class="topbar" hidden></header>
+    <main>
+      <h1>Kullanıcılar</h1>
+      <p id="page-status" class="notice" role="status">Kullanıcılar yükleniyor…</p>
+      <section id="content" hidden>
+        <table class="users">
+          <caption class="visually-hidden">Hesaplar</caption>
+          <thead>
+            <tr><th scope="col">Ad soyad</th><th scope="col">E-posta</th><th scope="col">Rol</th><th scope="col">Yönetici</th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+
+        <form id="create-form" class="card" novalidate>
+          <h2>Kullanıcı oluştur</h2>
+          <label for="full_name">Ad soyad</label>
+          <input id="full_name" name="full_name" required maxlength="100" aria-describedby="full_name-error" />
+          <p id="full_name-error" class="field-error"></p>
+          <label for="email">E-posta</label>
+          <input id="email" name="email" type="email" required autocomplete="off" aria-describedby="email-error" />
+          <p id="email-error" class="field-error"></p>
+          <label for="role">Rol</label>
+          <select id="role" name="role" aria-describedby="role-error">
+            <option value="EMPLOYEE">Çalışan</option>
+            <option value="MANAGER">Yönetici</option>
+            <option value="HR">İK</option>
+          </select>
+          <p id="role-error" class="field-error"></p>
+          <label for="manager_id">Yönetici</label>
+          <select id="manager_id" name="manager_id" aria-describedby="manager_id-error"></select>
+          <p id="manager_id-error" class="field-error"></p>
+          <p id="form-error" class="form-error" role="alert"></p>
+          <button id="submit" type="submit">Kullanıcı oluştur</button>
+        </form>
+
+        <section id="created" class="card created" role="status" hidden>
+          <h2 id="created-title"></h2>
+          <p id="created-email"></p>
+          <p>Geçici parola: <code id="created-password"></code></p>
+          <p id="created-warning" class="warning"></p>
+        </section>
+      </section>
+    </main>
+    <script type="module">
+      import {
+        createdNotice, createErrors, listState, managerOptions, TEXT, userRows,
+      } from "/users-view.js";
+      import { api, requireUser, showFieldErrors } from "/session.js";
+
+      const status = document.getElementById("page-status");
+      const content = document.getElementById("content");
+      const form = document.getElementById("create-form");
+
+      function cell(text) {
+        const td = document.createElement("td");
+        td.textContent = text;
+        return td;
+      }
+
+      async function load() {
+        status.textContent = TEXT.loading;
+        const result = await api("/api/users");
+        const state = result ? listState(result.status, result.body) : { kind: "error" };
+        if (state.kind !== "list") {
+          status.textContent = state.kind === "forbidden" ? TEXT.forbidden : TEXT.error;
+          content.hidden = true;
+          return;
+        }
+        document.getElementById("rows").replaceChildren(
+          ...userRows(state.users).map((row) => {
+            const tr = document.createElement("tr");
+            tr.append(cell(row.name), cell(row.email), cell(row.role), cell(row.manager));
+            return tr;
+          }),
+        );
+        const select = document.getElementById("manager_id");
+        const none = document.createElement("option");
+        none.value = "";
+        none.textContent = "— Yönetici yok —";
+        select.replaceChildren(none, ...managerOptions(state.users).map((o) => {
+          const option = document.createElement("option");
+          option.value = o.value;
+          option.textContent = o.label;
+          return option;
+        }));
+        status.textContent = "";
+        content.hidden = false;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        document.getElementById("submit").disabled = true;
+        document.getElementById("created").hidden = true;
+        const result = await api("/api/users", {
+          method: "POST",
+          body: {
+            full_name: form.full_name.value,
+            email: form.email.value,
+            role: form.role.value,
+            manager_id: form.manager_id.value || null,
+          },
+        });
+        document.getElementById("submit").disabled = false;
+        if (result && result.status === 201) {
+          const notice = createdNotice(result.body);
+          document.getElementById("created-title").textContent = notice.title;
+          document.getElementById("created-email").textContent = notice.email;
+          document.getElementById("created-password").textContent = notice.tempPassword;
+          document.getElementById("created-warning").textContent = notice.warning;
+          document.getElementById("created").hidden = false;
+          form.reset();
+          showFieldErrors(form, {});
+          document.getElementById("form-error").textContent = "";
+          await load();
+          return;
+        }
+        const errors = result ? createErrors(result.status, result.body) : createErrors(0, null);
+        document.getElementById("form-error").textContent = errors.formError;
+        showFieldErrors(form, errors.fields);
+      });
+
+      const me = await requireUser();
+      if (me.role !== "HR") {
+        status.textContent = TEXT.forbidden;
+      } else {
+        await load();
+      }
+    </script>
+  </body>
+</html>

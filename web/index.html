@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>İzin Yöneticisi</title>
     <link rel="stylesheet" href="/styles.css" />
-    <script type="module" src="/app.js"></script>
+    <script type="module">
+      // Korumalı sayfa: oturum yoksa giriş sayfasına yönlendirilir (spec 0002, AC-19).
+      import { requireUser } from "/session.js";
+      await requireUser();
+      await import("/app.js");
+    </script>
   </head>
   <body>
+    <header id="topbar" class="topbar" hidden></header>
     <main>
       <h1>İzin Yöneticisi</h1>
       <section id="health" class="health" aria-live="polite" data-tone="loading">
