@@ -12,6 +12,7 @@ dependencies = [
   "uvicorn",
   "sqlalchemy>=2.0,<2.1",
   "alembic",
+  "argon2-cffi",
 ]
 
 [project.optional-dependencies]
