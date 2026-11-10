@@ -175,3 +175,85 @@ class MemoryStore:
 @pytest.fixture
 def memory_store() -> MemoryStore:
     return MemoryStore()
+
+
+# --- integration: uygulama istemcileri ve hazır hesaplar ----------------------------------------
+
+NEW_PASSWORD = "yepyeni ve uzun parola"
+
+
+@pytest.fixture
+def make_client(db_url: str, clock: MutableClock, fast_hasher: Argon2PasswordHasher):  # type: ignore[no-untyped-def]
+    """Her çağrı ayrı bir "tarayıcı" (kendi cookie'leri) — hepsi aynı test veritabanında."""
+    from fastapi.testclient import TestClient
+
+    from app.config import Settings
+    from app.main import create_app
+
+    clients: list[TestClient] = []
+
+    def _make() -> TestClient:
+        client = TestClient(create_app(Settings(database_url=db_url), clock, hasher=fast_hasher))
+        client.__enter__()
+        clients.append(client)
+        return client
+
+    yield _make
+    for client in clients:
+        client.__exit__(None, None, None)
+
+
+@dataclass
+class Account:
+    id: str
+    email: str
+    password: str
+
+
+class Accounts:
+    """İK ilk hesabı + İK'nın açtığı hesaplar; isteğe bağlı olarak parolası değiştirilmiş."""
+
+    def __init__(self, make_client) -> None:  # type: ignore[no-untyped-def]
+        self._make = make_client
+        self.admin = make_client()
+        created = self.admin.app.state.user_service.create_first_hr(
+            email="ik@firma.com", full_name="İK Uzmanı"
+        )
+        self.hr_temp = Account(created.user.id, "ik@firma.com", created.temp_password)
+        self.hr = self.activate(self.hr_temp, self.admin)
+
+    def login(self, account: Account, client=None):  # type: ignore[no-untyped-def]
+        client = client or self._make()
+        response = client.post(
+            "/api/auth/login", json={"email": account.email, "password": account.password}
+        )
+        assert response.status_code == 200, response.text
+        return client
+
+    def activate(self, temp: Account, client=None) -> Account:  # type: ignore[no-untyped-def]
+        client = self.login(temp, client)
+        response = client.post(
+            "/api/auth/password",
+            json={"current_password": temp.password, "new_password": NEW_PASSWORD},
+        )
+        assert response.status_code == 204, response.text
+        return Account(temp.id, temp.email, NEW_PASSWORD)
+
+    def create(self, email: str, role: str, manager_id: str | None = None) -> Account:
+        response = self.admin.post(
+            "/api/users",
+            json={
+                "email": email,
+                "full_name": email.split("@")[0],
+                "role": role,
+                "manager_id": manager_id,
+            },
+        )
+        assert response.status_code == 201, response.text
+        body = response.json()
+        return Account(body["user"]["id"], email, body["temp_password"])
+
+
+@pytest.fixture
+def accounts(make_client) -> Accounts:  # type: ignore[no-untyped-def]
+    return Accounts(make_client)

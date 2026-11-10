@@ -37,9 +37,12 @@ class ThrottleRepository(Protocol):
 class UnitOfWork(Protocol):
     """Bir kullanım senaryosu = bir transaction: başarıda commit, istisnada rollback (A-1)."""
 
-    users: UserRepository
-    sessions: SessionRepository
-    throttle: ThrottleRepository
+    @property
+    def users(self) -> UserRepository: ...
+    @property
+    def sessions(self) -> SessionRepository: ...
+    @property
+    def throttle(self) -> ThrottleRepository: ...
 
     def __enter__(self) -> Self: ...
 

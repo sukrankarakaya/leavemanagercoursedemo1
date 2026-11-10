@@ -63,14 +63,14 @@ include_external_packages = true
 name = "Katman sırası (döngü yok, yukarı doğru import yok) — kural 6"
 type = "layers"
 containers = ["app"]
-layers = ["main", "api", "services", "repositories", "db", "domain"]
+layers = ["main | cli", "api", "services", "repositories", "db", "domain"]
 
 [[tool.importlinter.contracts]]
 name = "domain saf kalır — kural 1"
 type = "forbidden"
 source_modules = ["app.domain"]
 forbidden_modules = [
-  "app.api", "app.services", "app.repositories", "app.db", "app.main", "app.config",
+  "app.api", "app.services", "app.repositories", "app.db", "app.main", "app.cli", "app.config",
   "fastapi", "starlette", "sqlalchemy", "pydantic", "alembic",
 ]
 
